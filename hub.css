@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0&display=swap');
+
+/* ============================================================================
+   GRAPHITE  -  Hubitat dashboard2 external stylesheet
+   Dark graphite base (flows out of Hubitat's dark + lime loading screen).
+   Manrope + JetBrains Mono. Material Symbols Rounded icons.
+   Semantic multi-accent palette:
+     --on        amber       lit / running / active
+     --open      teal        open / flowing / cool
+     --secure    lime-green  settled-safe / locked / dry / all-good (Hubitat brand)
+     --attn      terracotta  needs you, calm (open contact, unlocked)
+     --alert     coral       real alert, rare (leak wet, intrusion, offline)
+     neutral     ink-muted   off / closed / at rest
+   ========================================================================== */
+:root {
+  --bg:          oklch(0.185 0.006 160);
+  --surface:     oklch(0.235 0.008 160);
+  --surface-2:   oklch(0.275 0.009 160);
+  --hairline:    oklch(0.330 0.008 160);
+  --ink:         oklch(0.945 0.005 160);
+  --ink-muted:   oklch(0.660 0.010 160);
+
+  --on:        oklch(0.800 0.120 80);    /* amber      */
+  --open:      oklch(0.720 0.090 200);   /* teal       */
+  --secure:    oklch(0.800 0.150 128);   /* lime-green */
+  --attn:      oklch(0.660 0.130 42);    /* terracotta */
+  --alert:     oklch(0.640 0.180 25);    /* coral/red  */
+
+  --on-wash:     oklch(0.800 0.120 80 / 0.14);
+  --open-wash:   oklch(0.720 0.090 200 / 0.14);
+  --secure-wash: oklch(0.800 0.150 128 / 0.12);
+  --attn-wash:   oklch(0.660 0.130 42 / 0.16);
+  --alert-wash:  oklch(0.640 0.180 25 / 0.18);
+
+  --r-tile:   16px;
+  --r-inner:  11px;
+  --ease:     cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---- canvas: beat the inline black background everywhere ---- */
+html, body, #app, .dashboard, .dashboard-body, .wrapper.z-0 {
+  background: var(--bg) !important;
+  color: var(--ink);
+  font-family: 'Manrope', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.wrapper.z-0 { gap: clamp(6px, 0.9vw, 14px) !important; padding: clamp(10px, 1.5vw, 24px) !important; }
+
+/* ---- kiosk hygiene ---- */
+.header { display: none !important; }
+.tile-edit { display: none !important; }
+
+/* ============================================================================
+   TILES
+   ========================================================================== */
+.tile {
+  font-family: 'Manrope', sans-serif;
+  color: var(--ink);
+  border: 1px solid transparent;
+  border-radius: var(--r-tile) !important;
+  box-shadow: none;
+  overflow: hidden;
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  transition: background-color .28s var(--ease), border-color .28s var(--ease), transform .12s var(--ease);
+}
+
+/* actionable tiles = soft surface cards (shades, switch, dimmer, button, lock, fan) */
+.tile.shades, .tile.switch, .tile.dimmer, .tile.button, .tile.lock, .tile.fan, .tile.valve,
+.tile.shades[style], .tile.switch[style], .tile.dimmer[style], .tile.button[style], .tile.lock[style], .tile.fan[style], .tile.valve[style] {
+  background: var(--surface) !important;
+  border-color: var(--hairline);
+}
+.tile.shades:active, .tile.switch:active, .tile.dimmer:active, .tile.button:active, .tile.lock:active {
+  transform: scale(0.985);
+}
+
+/* passive glance tiles = no card, hairline only (temperature, humidity, contact, motion, water, mode, hsm) */
+.tile.temperature, .tile.humidity, .tile.contact, .tile.motion, .tile.water, .tile.mode, .tile.hsm,
+.tile.door, .tile.window, .tile.presence, .tile.battery, .tile.attribute,
+.tile.temperature[style], .tile.humidity[style], .tile.contact[style], .tile.motion[style], .tile.water[style],
+.tile.mode[style], .tile.hsm[style], .tile.door[style], .tile.window[style], .tile.attribute[style] {
+  background: transparent !important;
+}
+
+/* nav / link tiles = quiet low pill */
+.tile.dashboard, .tile.link, .tile.dashboard[style], .tile.link[style] {
+  background: var(--surface) !important;
+  border-color: var(--hairline);
+}
+.tile.dashboard.selected, .tile.link.selected, .tile.dashboard.active, .tile.link.active {
+  background: var(--secure-wash) !important;
+  border-color: color-mix(in oklch, var(--secure) 45%, transparent);
+}
+
+/* device label: quiet uppercase caption (hideLabels:false). Hidden on nav/text/image. */
+.tile .tile-title {
+  position: static !important; order: -1;     /* Hubitat absolute-positions it at the bottom; pull it to the top */
+  flex: 0 0 auto; width: 100%;
+  padding: clamp(8px,4cqmin,16px) clamp(8px,1vw,14px) 0;
+  box-sizing: border-box;
+  font: 500 clamp(12px, 7cqmin, 18px)/1.25 'Manrope', sans-serif !important;
+  letter-spacing: 0; text-transform: none;
+  color: var(--ink) !important;
+  text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tile.dashboard .tile-title, .tile.link .tile-title, .tile.texttile .tile-title,
+.text-tile .tile-title, .tile.image .tile-title { display: none !important; }
+
+.tile-contents {
+  width: 100%; flex: 1 1 auto; min-height: 0;
+  padding: clamp(8px,1.1vw,16px);
+  box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(3px,0.5vw,7px); text-align: center;
+}
+
+/* primary value */
+.tile-primary, .tile-primary[style] {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  background: transparent !important;
+  font-size: clamp(13px, 13cqmin, 34px) !important;
+  letter-spacing: -0.01em; line-height: 1.1;
+}
+/* numbers + units = mono */
+.tile-primary span.small, .tile-primary[style] span.small {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 400 !important; color: var(--ink-muted) !important;
+  font-size: clamp(11px,1vw,15px) !important; letter-spacing: 0;
+}
+
+/* hide dashboard2's device-type subtext + stock name footer ghost (noise) */
+.tile-secondary { display: none !important; }
+.tile.text-tile > .flex-grow-0.w-full, .tile.shades > .flex-grow-0.w-full,
+.tile.switch > .flex-grow-0.w-full, .tile.dimmer > .flex-grow-0.w-full { display: none !important; }
+
+/* ============================================================================
+   ICONS  -  swap Material Icons -> Material Symbols Rounded (per glyph used)
+   ========================================================================== */
+.tile-primary i.material-icons, .tile-primary i.material-icons[style] {
+  color: var(--ink-muted) !important;
+  font-size: clamp(22px, 30cqmin, 88px) !important;
+  height: auto !important; width: auto !important;
+  transition: color .26s var(--ease);
+}
+.tile i.material-icons.he-shades_open::before,
+.tile i.material-icons.he-shades_closed::before,
+.tile i.material-icons.he-shades_partially_open::before {
+  font-family: 'Material Symbols Rounded' !important;
+  font-weight: 300 !important; font-feature-settings: 'liga' !important;
+}
+.tile i.material-icons.he-shades_open::before { content: 'roller_shades' !important; }
+.tile i.material-icons.he-shades_closed::before { content: 'roller_shades_closed' !important; }
+.tile i.material-icons.he-shades_partially_open::before { content: 'blinds' !important; }
+
+/* ============================================================================
+   STATE COLORS
+   ========================================================================== */
+/* SHADES: open/moving = teal (open/flowing); closed = neutral */
+.tile.shades .tile-primary.open i.material-icons,
+.tile.shades .tile-primary.opening i.material-icons,
+.tile.shades .tile-primary.partially-open i.material-icons { color: var(--open) !important; }
+.tile.shades:has(.tile-primary.open), .tile.shades:has(.tile-primary.partially-open) {
+  border-color: color-mix(in oklch, var(--open) 38%, transparent) !important;
+  background: var(--open-wash) !important;
+}
+
+/* SWITCH / DIMMER / scene on = amber (lit/running) */
+.tile.switch .tile-primary.on i.material-icons,
+.tile.dimmer .tile-primary.on i.material-icons,
+.tile.button .tile-primary.on i.material-icons { color: var(--on) !important; }
+.tile.switch:has(.tile-primary.on), .tile.dimmer:has(.tile-primary.on), .tile.button:has(.tile-primary.on) {
+  border-color: color-mix(in oklch, var(--on) 38%, transparent) !important;
+  background: var(--on-wash) !important;
+}
+
+/* LOCK locked / WATER dry / mode Home = secure (green) ; unlocked / wet / open contact = attn/alert */
+.tile.lock .tile-primary.locked i.material-icons { color: var(--secure) !important; }
+.tile.lock .tile-primary.unlocked i.material-icons { color: var(--attn) !important; }
+.tile.lock:has(.tile-primary.unlocked) { border-color: color-mix(in oklch, var(--attn) 40%, transparent) !important; background: var(--attn-wash) !important; }
+.tile.water .tile-primary.wet i.material-icons,
+.tile.door .tile-primary.open i.material-icons,
+.tile.window .tile-primary.open i.material-icons,
+.tile.contact .tile-primary.open i.material-icons,
+.tile.motion .tile-primary.active i.material-icons { color: var(--alert) !important; }
+.tile.water:has(.tile-primary.wet), .tile.contact:has(.tile-primary.open),
+.tile.door:has(.tile-primary.open), .tile.window:has(.tile-primary.open),
+.tile.motion:has(.tile-primary.active) { background: var(--alert-wash) !important; }
+
+/* MODE tile: clean centered, settled = secure tint on text */
+.tile.mode .tile-primary { color: var(--ink) !important; font-weight: 600 !important; }
+.tile.mode .tile-primary.Away, .tile.mode .tile-primary.System.Off { color: var(--attn) !important; }
+
+/* TEXT TILES: uppercase letterspaced section labels */
+.tile.texttile .tile-primary, .text-tile .items-center, .tile.texttile .items-center {
+  font-family: 'Manrope', sans-serif !important;
+  font-weight: 600 !important; text-transform: uppercase;
+  letter-spacing: 0.10em !important;
+  color: var(--ink-muted) !important;
+  font-size: clamp(11px,1vw,14px) !important;
+}
+
+/* ============================================================================
+   SLIDERS (shade position / dimmer level) - teal
+   ========================================================================== */
+.vue-slider { margin: clamp(6px,0.8vw,10px) clamp(6px,1vw,14px) 0 !important; }
+.vue-slider-rail, .vue-slider-rail[style] {
+  background: var(--surface-2) !important; border-radius: 999px !important; height: 6px !important;
+}
+.vue-slider-process, .vue-slider-process[style] {
+  background: var(--open) !important; border-radius: 999px !important;
+}
+.vue-slider-dot-handle, .vue-slider-dot-handle[style] {
+  background: var(--ink) !important; border: 3px solid var(--open) !important;
+  box-shadow: none !important; width: 18px !important; height: 18px !important;
+}
+
+/* ============================================================================
+   MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ============================================================================
+   SIMPLE shade tile: icon + name + big accent state (matches the approved
+   specimen). Slider + % belong on the Advanced board, not here.
+   ========================================================================== */
+.tile.shades .tile-contents {
+  gap: clamp(4px, 5cqmin, 18px) !important;
+  padding: clamp(10px, 7cqmin, 30px) !important;
+}
+.tile.shades .tile-primary { gap: clamp(4px, 4cqmin, 16px) !important; justify-content: center; }
+.tile.shades .tile-primary > div:nth-child(2) {                            /* the Open/Closed word */
+  font: 600 clamp(15px, 16cqmin, 34px)/1 'Manrope', sans-serif !important;
+}
+/* state word color (robust - colors the primary text whether div or node) */
+.tile.shades .tile-primary { color: var(--ink-muted) !important; }
+.tile.shades:has(.tile-primary.open) .tile-primary,
+.tile.shades:has(.tile-primary.opening) .tile-primary,
+.tile.shades:has(.tile-primary.partially-open) .tile-primary { color: var(--open) !important; }
